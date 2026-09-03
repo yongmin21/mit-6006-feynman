@@ -30,7 +30,8 @@ pre { max-width: 100%; overflow-x: auto; padding: 1.25rem; border-radius: .625re
 code, kbd, samp { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; }
 :not(pre) > code { padding: .12em .35em; border-radius: .25rem; background: var(--soft); }
 .formula { margin: 1.5rem 0; padding: 1rem; overflow-x: auto; text-align: center; font-weight: 750; background: var(--soft); border-radius: .625rem; }
-.recurrence, .tree { max-width: 100%; margin: 1.5rem 0; padding: 1rem; overflow-x: auto; border: 1px solid var(--line); border-radius: .625rem; background: var(--soft); text-align: center; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.recurrence, .tree, .tree-trace { max-width: 100%; margin: 1.5rem 0; padding: 1rem; overflow-x: auto; border: 1px solid var(--line); border-radius: .625rem; background: var(--soft); text-align: center; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+.tree-trace pre { display: inline-block; min-width: max-content; margin: 0; text-align: left; }
 .recurrence { display: grid; grid-template-columns: repeat(2, minmax(8rem, 1fr)); gap: .35rem 1rem; }
 .recurrence code { grid-column: 1 / -1; font-size: 1.05em; }
 .tree div + div { margin-top: .5rem; }

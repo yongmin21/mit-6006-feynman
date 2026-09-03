@@ -33,7 +33,8 @@ MIT OpenCourseWare의 **6.006 Introduction to Algorithms**를 따라가며 핵�
 - Part I · 계산을 보는 눈: Chapter 1–2 완료
 - Part II · 자료를 담는 방식: Chapter 3–6 완료
 - Part III · 순서를 만들어 문제를 푼다: Chapter 7–11 및 Quiz 1 Checkpoint 완료
-- 전체: 11개 Chapter + 1개 Checkpoint 완료
+- Part IV · 필요한 연산만 빠르게: Chapter 12–16 및 Data Structures Design Checkpoint 완료
+- 전체: 16개 Chapter + 2개 Checkpoint 완료
 
 | Chapter | 주제 | 상태 |
 | --- | --- | --- |
@@ -49,6 +50,12 @@ MIT OpenCourseWare의 **6.006 Introduction to Algorithms**를 따라가며 핵�
 | 10 | 비교 정렬 하한 | 완료 |
 | 11 | Counting Sort와 Radix Sort | 완료 |
 | Checkpoint | Chapter 3–11 Quiz 1 통합 복습 | 완료 |
+| 12 | Hashing과 기대 상수 시간 Set | 완료 |
+| 13 | Binary Search Tree와 Ordered Set | 완료 |
+| 14 | AVL balance와 rotations | 완료 |
+| 15 | Tree augmentation과 range aggregation | 완료 |
+| 16 | Priority Queue와 Binary Heap | 완료 |
+| Checkpoint | Chapter 3–6, 12–16 자료구조 설계 | 완료 |
 
 ## 참고
 
