@@ -11,7 +11,7 @@ h1 { margin: .25em 0; font-size: clamp(2.1rem, 7vw, 4rem); }
 h2 { margin-top: 2.5em; font-size: clamp(1.45rem, 4vw, 2rem); }
 h3 { font-size: 1.2rem; }
 p, li { max-width: 72ch; }
-a { color: var(--accent); text-underline-offset: .18em; }
+a { color: var(--accent); text-underline-offset: .18em; overflow-wrap: anywhere; }
 a:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 img, svg, video { display: block; max-width: 100%; height: auto; }
 .lead { font-size: clamp(1.1rem, 3vw, 1.3rem); color: var(--muted); }
@@ -32,7 +32,7 @@ code, kbd, samp { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberati
 .formula { margin: 1.5rem 0; padding: 1rem; overflow-x: auto; text-align: center; font-weight: 750; background: var(--soft); border-radius: .625rem; }
 .table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; }
-th, td { padding: .65rem; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+th, td { padding: .65rem; border: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
 summary { cursor: pointer; font-weight: 700; }
 .toc { border-bottom: 1px solid var(--line); }
 .toc summary { padding: .75rem 0; }

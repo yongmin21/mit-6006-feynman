@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="Sequence와 Set 인터페이스를 통해 연산부터 자료구조를 설계하는 법"><title>Chapter 3. 자료구조를 고르기 전에 연산부터 정의하라</title><link rel="stylesheet" href="../assets/css/book.css"></head>
+<body>
+<header class="site-header"><details class="toc"><summary>목차</summary><nav aria-label="전체 목차"><ul>
+<li><a href="../index.html">홈</a></li><li><a href="ch01-algorithms.html">Chapter 1. 알고리즘</a></li><li><a href="ch02-big-o.html">Chapter 2. Big-O</a></li><li><a href="ch03-interface.html" aria-current="page">Chapter 3. Interface</a></li><li><a href="ch04-array.html">Chapter 4. Array</a></li><li><a href="ch05-linked-list.html">Chapter 5. Linked List</a></li><li><a href="ch06-dynamic-array.html">Chapter 6. Dynamic Array</a></li>
+</ul></nav></details></header>
+<main><p class="eyebrow">PART II · 자료를 담는 방식</p><h1>Chapter 3. 자료구조를 고르기 전에 연산부터 정의하라</h1><p class="lead">자료구조는 상자가 아니라, 필요한 연산과 그 비용을 약속하는 구현이다.</p>
+<section class="card"><h2>학습목표</h2><ul><li>문제의 요구를 Sequence 또는 Set 연산으로 번역한다.</li><li>인터페이스와 구현을 분리하고 연산별 비용으로 구현을 선택한다.</li><li>문제의 불변식과 워크로드를 먼저 적는다.</li></ul></section>
+<section><h2>오늘의 문제</h2><p>음악 재생 목록에는 “세 번째 곡 재생”과 “다음 곡 삽입”이 필요하다. 연락처에는 “이름이 민수인 사람 찾기”가 필요하다. 둘 다 데이터를 저장하지만 같은 자료구조를 고르면 될까?</p></section>
+<section><h2>Brute force · 일단 한 리스트에 담기</h2><pre><code>items = []
+
+def find_key(key):
+    for item in items:
+        if item.key == key:
+            return item
+    return None</code></pre><p>정확하지만 키 검색은 Θ(n)이다. 순서가 중요한지, 키가 중요한지 정의하지 않은 채 구현부터 골랐기 때문이다.</p></section>
+<section><h2>병목</h2><p>병목은 “리스트가 느리다”가 아니다. 연락처의 주 연산인 <code>find(key)</code>가 매번 모든 항목을 읽는다는 점이다. 반대로 위치 접근이 핵심인 재생 목록에는 리스트가 자연스럽다.</p></section>
+<section><h2>아이디어 재발명</h2><ol><li>명사 대신 동사를 적는다: 가져오기, 넣기, 지우기, 찾기.</li><li>연산의 기준이 위치면 <strong>Sequence</strong>, 고유 키면 <strong>Set</strong>으로 묶는다.</li><li>가장 자주 쓰거나 반드시 빨라야 하는 연산에 맞춰 구현을 고른다.</li></ol></section>
+<section><h2>MIT formalization</h2><div class="table-wrap"><table><thead><tr><th>인터페이스</th><th>대표 연산</th><th>질문</th></tr></thead><tbody><tr><td>Sequence</td><td><code>get_at(i)</code>, <code>set_at(i,x)</code>, <code>insert_at(i,x)</code>, <code>delete_at(i)</code></td><td>몇 번째 원소인가?</td></tr><tr><td>Set</td><td><code>find(k)</code>, <code>insert(x)</code>, <code>delete(k)</code>, <code>find_min()</code></td><td>키 k를 가진 원소인가?</td></tr></tbody></table></div><p>인터페이스는 <em>무엇</em>을 할 수 있는지, 자료구조는 그 연산을 <em>어떻게</em> 구현하는지 말한다.</p></section>
+<aside class="callout why"><h2>WHY?</h2><p>같은 인터페이스를 만족하는 배열, 연결 리스트, 해시 테이블, 트리는 비용표가 다르다. 연산을 먼저 정의해야 “빠르다”를 문제에 맞게 말할 수 있다.</p></aside>
+<aside class="callout invariant"><h2>INVARIANT</h2><p>Sequence에서는 원소의 상대적 순서가 의미를 유지한다. Set에서는 각 원소가 검색 가능한 키를 가지며, 키의 동일성 규칙이 모든 연산에서 일관되어야 한다.</p></aside>
+<aside class="callout tradeoff"><h2>TRADE-OFF</h2><p>모든 연산을 동시에 Θ(1)로 만들 수는 없다. 위치 접근, 가운데 삽입, 키 검색 중 워크로드에 중요한 것을 우선한다.</p></aside>
+<aside class="callout warning"><h2>DON’T USE THIS WHEN</h2><p>구현 이름만 보고 선택하지 말자. “데이터가 많으니 해시 테이블” 같은 판단은 순서 탐색이나 최소 키 연산이 필요할 때 요구를 놓친다.</p></aside>
+<section><h2>손으로 추적하기</h2><p>Sequence <code>[A,B,C]</code>에 <code>insert_at(1,X)</code>를 적용하면 <code>[A,X,B,C]</code>다. Set <code>{7:A,2:B}</code>에 <code>find(2)</code>를 적용하면 위치가 아니라 키 2의 항목 B를 돌려준다. 같은 “찾기”라도 계약이 다르다.</p></section>
+<section><h2>의사코드</h2><pre><code>required = [get_at, insert_at, find]
+priority = {get_at: high, insert_at: low, find: high}
+
+for candidate in [array, linked_list, hash_table, tree]:
+    reject candidate if it cannot provide every required operation
+choose the remaining candidate with the best priority-weighted costs</code></pre></section>
+<section><h2>Correctness · 계약을 지키는가</h2><p>구현의 정확성은 내부 모양이 아니라 연산의 사후조건으로 증명한다. 예를 들어 <code>insert_at(i,x)</code> 뒤에는 길이가 하나 늘고, i의 값이 x이며, 기존 앞·뒤 원소의 상대 순서가 보존되어야 한다.</p></section>
+<section><h2>Complexity</h2><p>인터페이스 자체에는 시간복잡도가 없다. 배열로 구현한 Sequence는 위치 접근이 Θ(1)이지만, 연결 리스트는 일반적으로 Θ(n)이다. 비용은 반드시 <strong>연산 + 구현</strong> 쌍으로 말한다.</p></section>
+<section><h2>MIT-style 문제</h2><h3>Mechanics</h3><p>사진 앱의 “최근 사진 10개”, “ID로 사진 찾기”를 각각 Sequence/Set 연산으로 쓰라.</p><h3>Recognition</h3><p>앞뒤 삽입이 많고 임의 위치 접근은 없는 작업 큐에 중요한 연산을 고르라.</p><h3>Invention</h3><p>학생을 학번으로 찾으면서 성적 순서로도 순회해야 한다. 필요한 인터페이스와 보조 구조를 제안하라.</p><details><summary>해설 보기</summary><ol><li>최근 순서의 <code>get_at</code>/순회, ID 기준 <code>find</code>.</li><li><code>insert_first/last</code>, <code>delete_first</code>가 핵심이며 <code>get_at</code>은 우선순위가 낮다.</li><li>학번 Set과 성적 순서를 유지하는 ordered 구조를 함께 두고, 갱신 시 두 구조가 같은 학생 집합을 담는 불변식을 유지한다.</li></ol></details></section>
+<section class="card"><h2>Feynman Test</h2><p>“배열과 Sequence가 같은 말이 아닌 이유”를 코드 없이 설명하라.</p><p>어떤 자료구조가 빠르다는 주장에 반드시 따라야 하는 질문은 무엇인가?</p></section>
+<section><h2>빈 종이 테스트</h2><p><strong>요구 → 연산 → 인터페이스 → 구현 → 비용</strong> 다섯 칸을 그리고 연락처 앱을 채워 보라.</p></section>
+<section><h2>한 장 요약</h2><ul><li>Sequence는 위치, Set은 키로 질문한다.</li><li>인터페이스는 계약이고 자료구조는 구현이다.</li><li>먼저 필요한 연산과 빈도를 적고, 나중에 구현을 고른다.</li></ul></section>
+<section><h2>다음 장 연결</h2><p>위치 접근이 가장 중요한 Sequence라면 어떻게 Θ(1)을 얻을까? 다음 장에서 연속 메모리와 주소 계산으로 배열을 재발명한다.</p></section>
+<section class="resources" aria-labelledby="ocw-resources"><h2 id="ocw-resources">MIT OpenCourseWare Resources</h2><ul><li><span class="resource-type">Lecture</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/lecture-2-data-structures-and-dynamic-arrays/">Lecture 2: Data Structures and Dynamic Arrays</a></li><li><span class="resource-type">Notes</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/lecture-notes/">Lecture 2 Data Structures Notes · Recitation 2</a></li><li><span class="resource-type">Practice</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/problem-solving-notes/">Problem-Solving Notes · Problem Session 1</a></li><li><span class="resource-type">Quiz</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/quiz-1-review/">Quiz 1 Review: Data Structures</a></li></ul><p class="muted">문제는 학습목표만 유지해 새로 구성했으며 MIT 원문을 복제하지 않습니다.</p></section>
+<nav class="chapter-nav" aria-label="장 이동"><a href="ch02-big-o.html">← 이전: Big-O</a><a href="ch04-array.html">다음: Array →</a></nav></main>
+<footer class="site-footer"><small>MIT 6.006 Feynman 교재</small></footer></body></html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="정적 배열의 임의 접근과 삽입 비용을 배우는 장"><title>Chapter 4. Array — 위치를 알면 순간이동할 수 있다</title><link rel="stylesheet" href="../assets/css/book.css"></head>
+<body><header class="site-header"><details class="toc"><summary>목차</summary><nav aria-label="전체 목차"><ul><li><a href="../index.html">홈</a></li><li><a href="ch01-algorithms.html">Chapter 1. 알고리즘</a></li><li><a href="ch02-big-o.html">Chapter 2. Big-O</a></li><li><a href="ch03-interface.html">Chapter 3. Interface</a></li><li><a href="ch04-array.html" aria-current="page">Chapter 4. Array</a></li><li><a href="ch05-linked-list.html">Chapter 5. Linked List</a></li><li><a href="ch06-dynamic-array.html">Chapter 6. Dynamic Array</a></li></ul></nav></details></header>
+<main><p class="eyebrow">PART II · 자료를 담는 방식</p><h1>Chapter 4. Array — 위치를 알면 순간이동할 수 있다</h1><p class="lead">원소를 연속으로 놓으면 i번째 주소를 계산할 수 있다. 대신 틈을 만드는 일은 비싸다.</p>
+<section class="card"><h2>학습목표</h2><ul><li>연속 메모리에서 Θ(1) 임의 접근이 가능한 이유를 설명한다.</li><li>가운데 삽입·삭제가 Θ(n)인 이유를 이동 횟수로 분석한다.</li><li>정적 배열의 불변식과 사용 한계를 구분한다.</li></ul></section>
+<section><h2>오늘의 문제</h2><p>10억 개의 정수 중 800,000,000번째 값을 즉시 읽고 싶다. 앞에서부터 세지 않고 바로 갈 수 있을까?</p></section>
+<section><h2>Brute force · 앞에서부터 걷기</h2><pre><code>def get_at(items, i):
+    for position, value in enumerate(items):
+        if position == i:
+            return value
+    raise IndexError(i)</code></pre><p>i에 비례해 걸으므로 최악 Θ(n)이다.</p></section>
+<section><h2>병목</h2><p>각 원소의 위치를 찾기 위해 이전 원소를 모두 방문한다. 원소가 같은 크기로 연속 배치되어 있다면 주소를 산술로 계산할 수 있다.</p></section>
+<section><h2>아이디어 재발명</h2><p>첫 칸 주소를 B, 한 원소의 크기를 w라 하면 i번째 칸은 건너뛸 칸 수가 정확히 i개다.</p><div class="formula">address(i) = B + i × w</div><p>Word-RAM 모델에서 한 워드의 산술과 메모리 접근은 Θ(1)이므로 임의 접근도 Θ(1)이다.</p></section>
+<section><h2>MIT formalization</h2><p>정적 배열은 고정 길이의 연속 저장소다. Sequence의 <code>build</code>, <code>get_at</code>, <code>set_at</code>을 각각 Θ(n), Θ(1), Θ(1)에 제공한다. 크기를 바꾸는 연산은 새 배열 또는 원소 이동이 필요하다.</p></section>
+<aside class="callout why"><h2>WHY?</h2><p>배열은 “빠른 목록”이 아니라 주소 공식을 가진 목록이다. 이 공식이 순회 없이 어느 칸으로든 이동하게 한다.</p></aside>
+<aside class="callout invariant"><h2>INVARIANT</h2><p>길이 n의 배열에서 유효한 인덱스는 <code>0 ≤ i &lt; n</code>이며, i번째 원소는 항상 <code>B+i×w</code> 위치에 있다.</p></aside>
+<aside class="callout tradeoff"><h2>TRADE-OFF</h2><p>빠른 위치 접근의 대가는 연속 공간이다. 가운데에 원소를 넣으려면 뒤 원소를 밀어 주소 공식을 다시 만족시켜야 한다.</p></aside>
+<aside class="callout warning"><h2>DON’T USE THIS WHEN</h2><p>크기가 자주 변하고 특히 앞이나 가운데 삽입·삭제가 지배적이면 정적 배열 하나로 처리하지 말자.</p></aside>
+<section><h2>손으로 추적하기</h2><p><code>[A,B,C,D]</code>의 인덱스 1에 X를 넣으려면 D→4, C→3, B→2로 뒤에서부터 옮긴 뒤 X를 1에 쓴다. 세 원소를 옮겼으므로 비용은 입력 크기에 비례한다.</p></section>
+<section><h2>Python 모델</h2><pre><code>def insert_at(array, n, i, value):
+    """여유 칸이 하나 있는 고정 용량 배열의 앞 n칸을 사용한다."""
+    if not 0 &lt;= i &lt;= n or n == len(array):
+        raise IndexError("invalid index or full array")
+    for j in range(n, i, -1):
+        array[j] = array[j - 1]
+    array[i] = value</code></pre></section>
+<section><h2>Correctness</h2><p>루프가 j를 하나 줄일 때마다 구간 <code>[j,n]</code>에는 원래 <code>[j-1,n-1]</code>의 값이 한 칸 오른쪽으로 복사되어 있다. 뒤에서부터 옮겨 아직 읽지 않은 값을 덮지 않는다. 종료 후 i가 비므로 value를 써도 기존 순서가 보존된다.</p></section>
+<section><h2>Complexity</h2><div class="table-wrap"><table><thead><tr><th>연산</th><th>비용</th><th>이유</th></tr></thead><tbody><tr><td><code>get_at/set_at</code></td><td>Θ(1)</td><td>주소 계산</td></tr><tr><td><code>insert_at/delete_at</code></td><td>Θ(n)</td><td>최악에서 원소 이동</td></tr><tr><td><code>build</code></td><td>Θ(n)</td><td>n개 값 기록</td></tr></tbody></table></div></section>
+<section><h2>MIT-style 문제</h2><h3>Mechanics</h3><p>B=1000, w=8일 때 인덱스 13의 주소를 구하라.</p><h3>Recognition</h3><p>하루 한 번 만들고 백만 번 인덱스로 읽는 표에 배열이 맞는지 설명하라.</p><h3>Invention</h3><p>순환 버퍼에서 논리 인덱스 i를 물리 인덱스로 바꾸는 공식을 만들라.</p><details><summary>해설 보기</summary><ol><li><code>1000+13×8=1104</code>.</li><li>빌드 Θ(n)을 한 번 내고 조회 Θ(1)을 반복하므로 잘 맞는다.</li><li>용량 c와 시작점 s에 대해 <code>(s+i) mod c</code>.</li></ol></details></section>
+<section class="card"><h2>Feynman Test</h2><p>배열이 8억 번째 원소로 “순간이동”하는 과정을 주소라는 말 없이 설명할 수 있는가?</p><p>앞 삽입에서 복사를 앞에서부터 하면 왜 값이 사라지는가?</p></section>
+<section><h2>빈 종이 테스트</h2><p>주소 공식, 유효 인덱스, 가운데 삽입 그림, 세 연산의 비용표를 기억만으로 복원하라.</p></section>
+<section><h2>한 장 요약</h2><ul><li>연속 배치 + 고정 폭 원소 = 주소 계산 = Θ(1) 접근.</li><li>순서를 유지한 가운데 삽입·삭제는 Θ(n) 이동.</li><li>빠른 접근과 쉬운 크기 변경은 서로 다른 요구다.</li></ul></section>
+<section><h2>다음 장 연결</h2><p>원소를 움직이지 않고 순서만 바꾸려면 각 원소가 다음 원소를 가리키게 하면 된다. 연결 리스트의 출발점이다.</p></section>
+<section class="resources" aria-labelledby="ocw-resources"><h2 id="ocw-resources">MIT OpenCourseWare Resources</h2><ul><li><span class="resource-type">Lecture</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/lecture-2-data-structures-and-dynamic-arrays/">Lecture 2: Data Structures and Dynamic Arrays</a></li><li><span class="resource-type">Notes</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/lecture-notes/">Lecture 2 Data Structures Notes</a></li><li><span class="resource-type">Practice</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/problem-solving-notes/">Problem Session 1 · Recitation 2</a></li><li><span class="resource-type">Quiz</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/quizzes/">Quiz 1 Review and Solutions</a></li></ul></section>
+<nav class="chapter-nav" aria-label="장 이동"><a href="ch03-interface.html">← 이전: Interface</a><a href="ch05-linked-list.html">다음: Linked List →</a></nav></main><footer class="site-footer"><small>MIT 6.006 Feynman 교재</small></footer></body></html>

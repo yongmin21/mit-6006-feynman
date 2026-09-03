@@ -28,8 +28,24 @@ MIT OpenCourseWare의 **6.006 Introduction to Algorithms**를 따라가며 핵�
 - `assets/css/book.css`: 공통 반응형·인쇄 스타일
 - `references/`: MIT OCW 공식 자료 링크
 
+## 진도
+
+- Part I · 계산을 보는 눈: Chapter 1–2 완료
+- Part II · 자료를 담는 방식: Chapter 3–6 완료
+- 전체: 6개 Chapter 완료
+
+| Chapter | 주제 | 상태 |
+| --- | --- | --- |
+| 1 | 알고리즘과 정확성 | 완료 |
+| 2 | Big-O와 점근 분석 | 완료 |
+| 3 | Sequence vs Set, interface-first thinking | 완료 |
+| 4 | 정적 배열 | 완료 |
+| 5 | 연결 리스트 | 완료 |
+| 6 | 동적 배열과 분할상환 분석 | 완료 |
+
 ## 참고
 
 - [MIT OCW 6.006 Introduction to Algorithms (Fall 2011)](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/)
+- [MIT OCW 6.006 Introduction to Algorithms (Spring 2020)](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/)
 
 이 저장소는 MIT의 공식 번역물이나 배포물이 아닙니다.

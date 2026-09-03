@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="연결 리스트의 포인터 갱신과 연산 비용을 배우는 장"><title>Chapter 5. Linked List — 움직이지 않고 연결만 바꾼다</title><link rel="stylesheet" href="../assets/css/book.css"></head>
+<body><header class="site-header"><details class="toc"><summary>목차</summary><nav aria-label="전체 목차"><ul><li><a href="../index.html">홈</a></li><li><a href="ch01-algorithms.html">Chapter 1. 알고리즘</a></li><li><a href="ch02-big-o.html">Chapter 2. Big-O</a></li><li><a href="ch03-interface.html">Chapter 3. Interface</a></li><li><a href="ch04-array.html">Chapter 4. Array</a></li><li><a href="ch05-linked-list.html" aria-current="page">Chapter 5. Linked List</a></li><li><a href="ch06-dynamic-array.html">Chapter 6. Dynamic Array</a></li></ul></nav></details></header>
+<main><p class="eyebrow">PART II · 자료를 담는 방식</p><h1>Chapter 5. Linked List — 움직이지 않고 연결만 바꾼다</h1><p class="lead">원소를 연속으로 두지 않는다. 각 노드가 다음 노드의 위치를 기억한다.</p>
+<section class="card"><h2>학습목표</h2><ul><li>노드와 링크로 Sequence 순서를 표현한다.</li><li>주어진 노드 뒤 삽입이 Θ(1), i번째 접근은 Θ(n)인 이유를 구분한다.</li><li>포인터 갱신 순서와 도달 가능성 불변식을 설명한다.</li></ul></section>
+<section><h2>오늘의 문제</h2><p>백만 개 원소의 맨 앞에 새 값을 매초 넣는다. 매번 전부 오른쪽으로 밀지 않고 할 수 있을까?</p></section>
+<section><h2>Brute force · 배열에서 밀기</h2><pre><code>for j in range(n, 0, -1):
+    array[j] = array[j - 1]
+array[0] = value</code></pre><p>앞 삽입 한 번에 Θ(n), n번 반복하면 Θ(n²)까지 커진다.</p></section>
+<section><h2>병목</h2><p>값 자체가 아니라 “연속 주소의 i번째 칸”이라는 규칙 때문에 모든 원소를 움직인다. 순서를 주소가 아닌 링크로 나타내면 값은 제자리에 둘 수 있다.</p></section>
+<section><h2>아이디어 재발명</h2><p>각 노드를 <code>(값, 다음 노드)</code>로 만든다. 새 X를 A 앞에 넣을 때 <code>X.next=A</code>, <code>head=X</code> 두 연결만 바꾼다.</p></section>
+<section><h2>MIT formalization</h2><p>단일 연결 리스트는 첫 노드 <code>head</code>와 각 노드의 <code>next</code> 포인터로 Sequence를 구현한다. 끝에는 <code>None</code>이 있다. 노드 참조가 이미 주어졌다면 그 뒤 삽입·삭제는 Θ(1)이지만, i번째 노드를 찾는 일은 head부터 걸어야 한다.</p></section>
+<aside class="callout why"><h2>WHY?</h2><p>삽입 위치를 알고 있을 때 데이터 전체를 재배치하지 않는다. 순서는 물리적 이웃이 아니라 링크가 결정한다.</p></aside>
+<aside class="callout invariant"><h2>INVARIANT</h2><p><code>head</code>에서 <code>next</code>를 반복해 정확히 모든 노드에 한 번씩 도달하고 마지막은 <code>None</code>이다. 잃어버린 노드와 의도치 않은 순환이 없어야 한다.</p></aside>
+<aside class="callout tradeoff"><h2>TRADE-OFF</h2><p>연결 변경은 싸지만 i번째 주소 공식이 없다. 임의 접근은 Θ(n)이고 각 노드에는 링크 저장 공간도 든다.</p></aside>
+<aside class="callout warning"><h2>DON’T USE THIS WHEN</h2><p>인덱스 조회가 잦거나 메모리 지역성이 중요한 수치 계산에는 연결 리스트보다 배열이 단순하고 빠르다.</p></aside>
+<section><h2>손으로 추적하기</h2><p><code>A→B→C</code>에서 B 뒤에 X를 넣는다. 먼저 <code>X.next=B.next</code>로 C를 보존하고, 다음 <code>B.next=X</code>로 연결한다. 순서를 바꾸면 C의 주소를 잃을 수 있다.</p></section>
+<section><h2>Python 구현</h2><pre><code>class Node:
+    def __init__(self, value, next=None):
+        self.value, self.next = value, next
+
+def insert_after(node, value):
+    node.next = Node(value, node.next)
+
+def delete_after(node):
+    if node.next is None:
+        raise IndexError("nothing to delete")
+    removed = node.next
+    node.next = removed.next
+    return removed.value</code></pre></section>
+<section><h2>Correctness</h2><p>삽입 전 node의 뒤쪽 체인을 S라 하자. 새 노드의 next를 먼저 S로 두고 node의 next를 새 노드로 바꾸면 결과는 <code>node→new→S</code>다. 기존 모든 노드의 순서와 도달 가능성이 보존되고 새 값만 하나 추가된다.</p></section>
+<section><h2>Complexity</h2><div class="table-wrap"><table><thead><tr><th>연산</th><th>비용</th></tr></thead><tbody><tr><td>첫 원소 읽기/삽입/삭제</td><td>Θ(1)</td></tr><tr><td>주어진 노드 뒤 삽입/삭제</td><td>Θ(1)</td></tr><tr><td><code>get_at(i)</code>, 값 검색</td><td>Θ(n) 최악</td></tr><tr><td>전체 순회</td><td>Θ(n)</td></tr></tbody></table></div><p>“삽입 Θ(1)”은 삽입 지점의 노드 참조가 이미 있을 때만 맞다. 위치를 찾는 비용까지 포함하면 Θ(n)일 수 있다.</p></section>
+<section><h2>MIT-style 문제</h2><h3>Mechanics</h3><p><code>A→B→C</code>에서 A 뒤 노드를 삭제한 뒤 링크를 그리라.</p><h3>Recognition</h3><p>스택의 push/pop을 연결 리스트 어느 쪽에서 해야 하는가?</p><h3>Invention</h3><p>마지막 삽입도 Θ(1)로 만들기 위한 최소 상태와 불변식을 제안하라.</p><details><summary>해설 보기</summary><ol><li><code>A.next=C</code>, 제거된 B의 값이 반환된다.</li><li>head에서 하면 둘 다 Θ(1)이다.</li><li><code>tail</code>을 저장한다. 빈 리스트에서는 head와 tail이 모두 None이고, 비어 있지 않으면 tail.next는 None이다.</li></ol></details></section>
+<section class="card"><h2>Feynman Test</h2><p>연결 리스트의 삽입이 언제 Θ(1)이 아니게 되는가?</p><p>포인터 두 줄의 순서가 데이터를 잃게 할 수 있는 이유를 설명하라.</p></section>
+<section><h2>빈 종이 테스트</h2><p>노드 세 개, 앞 삽입, 중간 삭제, 도달 가능성 불변식, 비용표를 그려라.</p></section>
+<section><h2>한 장 요약</h2><ul><li>링크가 순서를 정하므로 원소를 옮기지 않는다.</li><li>위치를 이미 알면 연결 변경은 Θ(1), 위치 찾기는 Θ(n).</li><li>항상 나머지 체인을 보존한 뒤 링크를 바꾼다.</li></ul></section>
+<section><h2>다음 장 연결</h2><p>배열의 빠른 접근과 크기 변경을 함께 얻을 수는 없을까? 여유 공간과 가끔의 복사로 평균 비용을 낮춘다.</p></section>
+<section class="resources" aria-labelledby="ocw-resources"><h2 id="ocw-resources">MIT OpenCourseWare Resources</h2><ul><li><span class="resource-type">Lecture</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/lecture-2-data-structures-and-dynamic-arrays/">Lecture 2: Data Structures and Dynamic Arrays</a></li><li><span class="resource-type">Notes</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/lecture-notes/">Lecture 2 Notes · Recitation 2</a></li><li><span class="resource-type">Practice</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/problem-solving-notes/">Problem Session 1</a></li><li><span class="resource-type">Quiz</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/quiz-1-review/">Quiz 1 Review: Interface-first Selection</a></li></ul></section>
+<nav class="chapter-nav" aria-label="장 이동"><a href="ch04-array.html">← 이전: Array</a><a href="ch06-dynamic-array.html">다음: Dynamic Array →</a></nav></main><footer class="site-footer"><small>MIT 6.006 Feynman 교재</small></footer></body></html>

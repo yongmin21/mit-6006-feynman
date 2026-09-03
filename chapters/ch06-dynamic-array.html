@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="동적 배열과 분할상환 분석을 배우는 장"><title>Chapter 6. Dynamic Array — 미래를 위해 공간을 남겨둔다</title><link rel="stylesheet" href="../assets/css/book.css"></head>
+<body><header class="site-header"><details class="toc"><summary>목차</summary><nav aria-label="전체 목차"><ul><li><a href="../index.html">홈</a></li><li><a href="ch01-algorithms.html">Chapter 1. 알고리즘</a></li><li><a href="ch02-big-o.html">Chapter 2. Big-O</a></li><li><a href="ch03-interface.html">Chapter 3. Interface</a></li><li><a href="ch04-array.html">Chapter 4. Array</a></li><li><a href="ch05-linked-list.html">Chapter 5. Linked List</a></li><li><a href="ch06-dynamic-array.html" aria-current="page">Chapter 6. Dynamic Array</a></li></ul></nav></details></header>
+<main><p class="eyebrow">PART II · 자료를 담는 방식</p><h1>Chapter 6. Dynamic Array — 미래를 위해 공간을 남겨둔다</h1><p class="lead">매번 딱 맞게 만들지 않는다. 두 배의 여유를 사서 비싼 복사를 드물게 만든다.</p>
+<section class="card"><h2>학습목표</h2><ul><li>길이와 용량을 구분하고 동적 배열의 불변식을 설명한다.</li><li>기하급수적 확장이 append의 분할상환 Θ(1)을 만드는 이유를 계산한다.</li><li>최악 한 번의 비용과 연산열 평균 비용을 구분한다.</li></ul></section>
+<section><h2>오늘의 문제</h2><p>최종 크기를 모르는 로그를 차례로 저장하면서 인덱스 접근은 Θ(1)로 유지하고 싶다. 매번 새 배열을 만들지 않고 어떻게 할까?</p></section>
+<section><h2>Brute force · 매번 정확한 크기로 복사</h2><pre><code>def append_exact(array, value):
+    bigger = [None] * (len(array) + 1)
+    for i, item in enumerate(array):
+        bigger[i] = item
+    bigger[-1] = value
+    return bigger</code></pre><p>k번째 append가 Θ(k)이므로 n번 비용은 <code>1+2+…+n=Θ(n²)</code>이다.</p></section>
+<section><h2>병목</h2><p>공간이 한 칸 필요할 때마다 기존 원소 전체를 복사한다. 복사를 피할 수 없다면 복사 사이의 간격을 빠르게 늘려야 한다.</p></section>
+<section><h2>아이디어 재발명</h2><p>배열이 꽉 찼을 때 한 칸이 아니라 용량을 두 배로 늘린다. 복사는 크기 1, 2, 4, 8, …에서만 일어난다.</p><div class="formula">1 + 2 + 4 + ··· + n/2 &lt; n</div><p>n번 append 동안 복사한 원소는 2n보다 적고 새 값 쓰기 n번을 더해도 총 Θ(n), 연산당 분할상환 Θ(1)이다.</p></section>
+<section><h2>MIT formalization</h2><p>동적 배열은 용량 <code>capacity</code>의 정적 배열과 실제 원소 수 <code>length</code>를 가진다. <code>length &lt; capacity</code>면 끝 삽입은 한 칸 쓰기다. 같으면 더 큰 배열을 만들고 복사한다. 성장 인자 2는 용량이 기하급수적으로 커지게 한다.</p></section>
+<aside class="callout why"><h2>WHY?</h2><p>미리 남긴 빈칸은 낭비가 아니라 미래 append를 위한 선불 비용이다. 비싼 작업을 충분히 많은 싼 작업 사이에 퍼뜨린다.</p></aside>
+<aside class="callout invariant"><h2>INVARIANT</h2><p><code>0 ≤ length ≤ capacity</code>이고 유효한 원소는 저장소의 <code>[0,length)</code>에 순서대로 있다. <code>[length,capacity)</code>는 접근할 수 없는 여유 공간이다.</p></aside>
+<aside class="callout tradeoff"><h2>TRADE-OFF</h2><p>append와 임의 접근은 빠르지만 사용하지 않는 용량을 허용한다. 성장 인자가 크면 복사는 줄고 빈 공간은 늘며, 작으면 그 반대다.</p></aside>
+<aside class="callout warning"><h2>DON’T USE THIS WHEN</h2><p>각 연산의 엄격한 최악 Θ(1) 지연이 필요하면 resize 한 번의 Θ(n)이 문제가 된다. 또한 앞·가운데 삽입은 여전히 Θ(n)이다.</p></aside>
+<section><h2>손으로 추적하기</h2><div class="table-wrap"><table><thead><tr><th>append 값</th><th>길이 전→후</th><th>용량 전→후</th><th>복사</th></tr></thead><tbody><tr><td>A</td><td>0→1</td><td>1→1</td><td>0</td></tr><tr><td>B</td><td>1→2</td><td>1→2</td><td>1</td></tr><tr><td>C</td><td>2→3</td><td>2→4</td><td>2</td></tr><tr><td>D</td><td>3→4</td><td>4→4</td><td>0</td></tr><tr><td>E</td><td>4→5</td><td>4→8</td><td>4</td></tr></tbody></table></div></section>
+<section><h2>Python 구현</h2><pre><code>class DynamicArray:
+    def __init__(self):
+        self.length, self.capacity = 0, 1
+        self.data = [None]
+
+    def append(self, value):
+        if self.length == self.capacity:
+            self.capacity *= 2
+            bigger = [None] * self.capacity
+            for i in range(self.length):
+                bigger[i] = self.data[i]
+            self.data = bigger
+        self.data[self.length] = value
+        self.length += 1
+
+    def get_at(self, i):
+        if not 0 &lt;= i &lt; self.length:
+            raise IndexError(i)
+        return self.data[i]</code></pre></section>
+<section><h2>Correctness와 핵심 불변식</h2><p>resize 전 유효 원소 <code>[0,length)</code>를 같은 인덱스로 복사하므로 값과 순서가 보존된다. 이후 새 값을 정확히 length 위치에 쓰고 length를 하나 늘린다. 따라서 모든 append 뒤에도 유효 구간과 용량 불변식이 유지된다.</p></section>
+<section><h2>Complexity · 최악과 분할상환</h2><div class="table-wrap"><table><thead><tr><th>연산</th><th>최악</th><th>분할상환</th></tr></thead><tbody><tr><td><code>get_at/set_at</code></td><td>Θ(1)</td><td>Θ(1)</td></tr><tr><td><code>append</code></td><td>Θ(n)</td><td>Θ(1)</td></tr><tr><td>가운데 삽입/삭제</td><td>Θ(n)</td><td>Θ(n)</td></tr></tbody></table></div><p>분할상환은 확률적 평균이 아니다. 어떤 n번의 append 연산열에도 총비용 Θ(n)을 보장한다.</p></section>
+<section><h2>MIT-style 문제</h2><h3>Mechanics</h3><p>초기 용량 1에서 9개를 append할 때 resize 시점과 복사 수를 구하라.</p><h3>Recognition</h3><p>매번 용량을 10칸씩 늘리면 왜 append가 분할상환 Θ(1)이 아닌가?</p><h3>Invention</h3><p>삭제 후 축소한다면 매 append/delete마다 resize가 반복되는 진동을 어떻게 막을까?</p><details><summary>해설 보기</summary><ol><li>길이 1,2,4,8에서 resize하고 <code>1+2+4+8=15</code>개를 복사한다.</li><li>resize가 Θ(n)번마다 아니라 상수 10번마다 일어나 총 복사가 Θ(n²)이다.</li><li>가득 찰 때 2배 확장하되 사용량이 용량의 1/4 이하일 때만 절반으로 줄여 확장·축소 경계에 간격을 둔다.</li></ol></details></section>
+<section class="card"><h2>Feynman Test</h2><p>append 한 번이 Θ(n)인데도 왜 “append는 분할상환 Θ(1)”이라고 말할 수 있는가?</p><p>분할상환과 평균 경우가 다른 이유는 무엇인가?</p></section>
+<section><h2>빈 종이 테스트</h2><p>길이/용량 그림, 1·2·4·8 복사열, 기하급수 합, 최악/분할상환 비용표를 복원하라.</p></section>
+<section><h2>한 장 요약</h2><ul><li>동적 배열은 정적 배열 + 길이 + 용량이다.</li><li>꽉 찰 때 두 배로 늘리면 n번 append의 총비용은 Θ(n).</li><li>append는 최악 Θ(n), 분할상환 Θ(1), 임의 접근은 Θ(1).</li></ul></section>
+<section><h2>다음 장 연결</h2><p>Part II에서 배열 계열 Sequence의 선택 기준을 만들었다. 다음에는 키로 찾는 Set과 정렬·검색 구현을 비교할 준비가 되었다.</p></section>
+<section class="resources" aria-labelledby="ocw-resources"><h2 id="ocw-resources">MIT OpenCourseWare Resources</h2><ul><li><span class="resource-type">Lecture</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/lecture-2-data-structures-and-dynamic-arrays/">Lecture 2: Data Structures and Dynamic Arrays</a></li><li><span class="resource-type">Notes</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/lecture-notes/">Lecture 2 Data Structures Notes · Recitation 2</a></li><li><span class="resource-type">Practice</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/problem-solving-notes/">Problem Session 1 and Solutions</a></li><li><span class="resource-type">Quiz</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/resources/quiz-1-review/">Quiz 1 Review: Data Structures and Amortization</a></li></ul></section>
+<nav class="chapter-nav" aria-label="장 이동"><a href="ch05-linked-list.html">← 이전: Linked List</a><a href="../index.html">목차 →</a></nav></main><footer class="site-footer"><small>MIT 6.006 Feynman 교재</small></footer></body></html>
