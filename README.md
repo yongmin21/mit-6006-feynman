@@ -32,7 +32,8 @@ MIT OpenCourseWare의 **6.006 Introduction to Algorithms**를 따라가며 핵�
 
 - Part I · 계산을 보는 눈: Chapter 1–2 완료
 - Part II · 자료를 담는 방식: Chapter 3–6 완료
-- 전체: 6개 Chapter 완료
+- Part III · 순서를 만들어 문제를 푼다: Chapter 7–11 및 Quiz 1 Checkpoint 완료
+- 전체: 11개 Chapter + 1개 Checkpoint 완료
 
 | Chapter | 주제 | 상태 |
 | --- | --- | --- |
@@ -42,6 +43,12 @@ MIT OpenCourseWare의 **6.006 Introduction to Algorithms**를 따라가며 핵�
 | 4 | 정적 배열 | 완료 |
 | 5 | 연결 리스트 | 완료 |
 | 6 | 동적 배열과 분할상환 분석 | 완료 |
+| 7 | 정렬을 중간 표현으로 사용하기 | 완료 |
+| 8 | Selection Sort와 Insertion Sort | 완료 |
+| 9 | Merge Sort와 분할정복 | 완료 |
+| 10 | 비교 정렬 하한 | 완료 |
+| 11 | Counting Sort와 Radix Sort | 완료 |
+| Checkpoint | Chapter 3–11 Quiz 1 통합 복습 | 완료 |
 
 ## 참고
 
