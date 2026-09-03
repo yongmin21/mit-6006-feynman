@@ -1,104 +1,19 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chapter 1. 알고리즘이란 무엇인가?</title>
-  <link rel="stylesheet" href="../assets/css/book.css">
-</head>
-<body>
-  <main>
-    <nav><a href="../index.html">← 목차</a></nav>
-    <p class="eyebrow">PART I · 계산을 보는 눈</p>
-    <h1>Chapter 1. 알고리즘이란 무엇인가?</h1>
-    <p class="lead">컴퓨터에게 “문제를 푼다”는 것은 무슨 뜻일까?</p>
-
-    <section>
-      <h2>오늘의 문제</h2>
-      <p>1,000만 명의 전화번호부에서 <code>김알고</code>를 찾는다고 하자. 가장 먼저 떠오르는 방법은 앞에서부터 한 명씩 보는 것이다.</p>
-      <pre><code>def find_phone(people, target):
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="알고리즘의 문제 정의, 정확성, 효율성과 불변식을 배우는 장"><title>Chapter 1. 알고리즘이란 무엇인가?</title><link rel="stylesheet" href="../assets/css/book.css"></head>
+<body><header class="site-header"><details class="toc"><summary>목차</summary><nav aria-label="전체 목차"><ul><li><a href="../index.html">홈</a></li><li><a href="ch01-algorithms.html" aria-current="page">Chapter 1. 알고리즘이란 무엇인가?</a></li><li><a href="ch02-big-o.html">Chapter 2. Big-O는 속도를 재는 단위가 아니다</a></li></ul></nav></details></header>
+<main><p class="eyebrow">PART I · 계산을 보는 눈</p><h1>Chapter 1. 알고리즘이란 무엇인가?</h1><p class="lead">컴퓨터에게 “문제를 푼다”는 것은 무슨 뜻일까?</p>
+<section><h2>오늘의 문제</h2><p>1,000만 명의 전화번호부에서 <code>김알고</code>를 찾는다고 하자. 가장 먼저 떠오르는 방법은 앞에서부터 한 명씩 보는 것이다.</p><pre><code>def find_phone(people, target):
     for name, phone in people:
         if name == target:
             return phone
-    return None</code></pre>
-      <p>단순하지만 맞다. 알고리즘 설계는 종종 가장 영리한 방법이 아니라 <strong>확실히 맞는 방법</strong>에서 시작한다.</p>
-    </section>
-
-    <aside class="callout why">
-      <h2>WHY?</h2>
-      <p>알고리즘은 특정 언어의 코드가 아니라, 입력을 올바른 출력으로 바꾸는 명확한 절차다. 좋은 설명은 세 단계로 이어진다: <strong>풀기 → 증명하기 → 분석하기</strong>.</p>
-    </aside>
-
-    <section>
-      <h2>문제를 먼저 정의하라</h2>
-      <p>“리스트에서 큰 값을 찾기”는 모호하다. 최댓값인가, 위치인가, 상위 10개인가? 빈 리스트는 허용하는가?</p>
-      <div class="formula">입력 → 계산 문제 → 출력</div>
-      <p>예를 들어 최댓값 문제는 “비어 있지 않은 숫자 수열을 입력받아, 모든 원소 이상인 한 원소를 출력한다”라고 정의할 수 있다.</p>
-    </section>
-
-    <aside class="callout invariant">
-      <h2>INVARIANT</h2>
-      <p>왼쪽부터 원소를 확인할 때, <code>best</code>는 지금까지 본 원소 중 최댓값이다. 반복이 끝나면 모든 원소를 보았으므로 <code>best</code>는 전체 최댓값이다.</p>
-    </aside>
-
-    <section>
-      <h2>효율성은 입력 크기의 함수다</h2>
-      <p>실행 시간은 컴퓨터와 환경에 따라 달라진다. 대신 입력 크기 <code>n</code>이 커질 때 필요한 작업량이 어떻게 증가하는지 본다.</p>
-      <ul>
-        <li>한 번 훑기: Θ(n)</li>
-        <li>모든 쌍 비교: Θ(n²)</li>
-        <li>매번 절반 버리기: Θ(log n)</li>
-      </ul>
-    </section>
-
-    <aside class="callout tradeoff">
-      <h2>TRADE-OFF</h2>
-      <p>정렬되지 않은 전화번호부를 한 번 찾는다면 선형 탐색이면 충분하다. 반복해서 찾는다면 정렬이나 해시 테이블을 준비하는 비용이 이득이 될 수 있다.</p>
-    </aside>
-
-    <aside class="callout warning">
-      <h2>DON’T USE THIS WHEN</h2>
-      <p>입력이 이미 정렬되어 있고 임의 접근이 가능하다면 선형 탐색은 불필요하다. 이진 탐색으로 후보를 절반씩 줄일 수 있다.</p>
-    </aside>
-
-    <section>
-      <h2>연습문제</h2>
-      <ol>
-        <li>빈 입력에서 위 전화번호 검색 함수는 무엇을 반환하는가?</li>
-        <li>최댓값 알고리즘의 불변식을 한 문장으로 설명하라.</li>
-        <li>100만 번 검색할 전화번호부라면 어떤 준비를 고려하겠는가?</li>
-      </ol>
-      <details>
-        <summary>해설 보기</summary>
-        <ol>
-          <li><code>None</code>을 반환한다.</li>
-          <li>지금까지 확인한 범위에서 현재 값이 최댓값이다.</li>
-          <li>이름으로 정렬해 이진 탐색하거나 해시 테이블을 구축할 수 있다. 준비 비용과 조회 횟수를 함께 비교해야 한다.</li>
-        </ol>
-      </details>
-    </section>
-
-    <section class="card">
-      <h2>Feynman Test</h2>
-      <p>코드를 보지 않고 초등학생에게 설명하듯 답해 보자.</p>
-      <p><strong>“프로그램”과 “알고리즘”은 어떻게 다른가?</strong></p>
-      <p><strong>왜 실행 시간을 초가 아니라 n의 함수로 표현하는가?</strong></p>
-    </section>
-
-    <section>
-      <h2>빈 종이 테스트 · 한 장 요약</h2>
-      <p>다음 다섯 단어만 적고 서로의 관계를 복원한다: <strong>입력, 출력, 정확성, 불변식, 성장률</strong>.</p>
-    </section>
-
-    <section>
-      <h2>MIT OpenCourseWare</h2>
-      <ul>
-        <li><a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/resources/lecture-1-algorithmic-thinking-peak-finding/">Lecture 1: Algorithmic Thinking, Peak Finding</a></li>
-        <li><a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/pages/lecture-notes/">Lecture Notes</a></li>
-        <li><a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/pages/assignments/">Problem Set 1과 해설</a></li>
-      </ul>
-      <p class="muted">원문을 복제하지 않고 공식 페이지로 연결합니다.</p>
-    </section>
-  </main>
-</body>
-</html>
+    return None</code></pre><p>단순하지만 맞다. 알고리즘 설계는 종종 가장 영리한 방법이 아니라 <strong>확실히 맞는 방법</strong>에서 시작한다.</p></section>
+<aside class="callout why"><h2>WHY?</h2><p>알고리즘은 특정 언어의 코드가 아니라, 입력을 올바른 출력으로 바꾸는 명확한 절차다. 좋은 설명은 <strong>풀기 → 증명하기 → 분석하기</strong>로 이어진다.</p></aside>
+<section><h2>문제를 먼저 정의하라</h2><p>“리스트에서 큰 값을 찾기”는 모호하다. 최댓값인가, 위치인가, 상위 10개인가? 빈 리스트는 허용하는가?</p><div class="formula">입력 → 계산 문제 → 출력</div><p>최댓값 문제는 “비어 있지 않은 숫자 수열을 입력받아, 모든 원소 이상인 한 원소를 출력한다”라고 정의할 수 있다.</p></section>
+<aside class="callout invariant"><h2>INVARIANT</h2><p>왼쪽부터 원소를 확인할 때, <code>best</code>는 지금까지 본 원소 중 최댓값이다. 반복이 끝나면 모든 원소를 보았으므로 <code>best</code>는 전체 최댓값이다.</p></aside>
+<section><h2>효율성은 입력 크기의 함수다</h2><p>실행 시간은 컴퓨터와 환경에 따라 달라진다. 대신 입력 크기 <code>n</code>이 커질 때 필요한 작업량이 어떻게 증가하는지 본다.</p><ul><li>한 번 훑기: Θ(n)</li><li>모든 쌍 비교: Θ(n²)</li><li>매번 절반 버리기: Θ(log n)</li></ul></section>
+<aside class="callout tradeoff"><h2>TRADE-OFF</h2><p>정렬되지 않은 전화번호부를 한 번 찾는다면 선형 탐색이면 충분하다. 반복해서 찾는다면 정렬이나 해시 테이블을 준비하는 비용이 이득이 될 수 있다.</p></aside>
+<aside class="callout warning"><h2>DON’T USE THIS WHEN</h2><p>입력이 이미 정렬되어 있고 임의 접근이 가능하다면 선형 탐색은 불필요하다. 이진 탐색으로 후보를 절반씩 줄일 수 있다.</p></aside>
+<section><h2>연습문제</h2><ol><li>빈 입력에서 위 전화번호 검색 함수는 무엇을 반환하는가?</li><li>최댓값 알고리즘의 불변식을 한 문장으로 설명하라.</li><li>100만 번 검색할 전화번호부라면 어떤 준비를 고려하겠는가?</li></ol><details><summary>해설 보기</summary><ol><li><code>None</code>을 반환한다.</li><li>지금까지 확인한 범위에서 현재 값이 최댓값이다.</li><li>이름으로 정렬해 이진 탐색하거나 해시 테이블을 구축할 수 있다. 준비 비용과 조회 횟수를 함께 비교해야 한다.</li></ol></details></section>
+<section class="card"><h2>Feynman Test</h2><p>코드를 보지 않고 초등학생에게 설명하듯 답해 보자.</p><p><strong>“프로그램”과 “알고리즘”은 어떻게 다른가?</strong></p><p><strong>왜 실행 시간을 초가 아니라 n의 함수로 표현하는가?</strong></p></section>
+<section><h2>빈 종이 테스트 · 한 장 요약</h2><p>다음 다섯 단어만 적고 서로의 관계를 복원한다: <strong>입력, 출력, 정확성, 불변식, 성장률</strong>.</p></section>
+<section class="resources" aria-labelledby="ocw-resources"><h2 id="ocw-resources">MIT OpenCourseWare Resources</h2><p>교재 → 강의 → 노트 → 연습 → 평가 순서로 확인한다.</p><ul><li><span class="resource-type">Lecture</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/resources/lecture-1-algorithmic-thinking-peak-finding/">Lecture 1: Algorithmic Thinking, Peak Finding</a></li><li><span class="resource-type">Notes</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/resources/mit6_006f11_lec01/">Lecture 01 Notes</a></li><li><span class="resource-type">Practice</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/pages/assignments/">Assignments and Solutions</a></li><li><span class="resource-type">Quiz</span> <a href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/pages/exams/">Quizzes and Solutions</a></li></ul><p class="muted">원문을 복제하지 않고 MIT의 공식 페이지로 연결합니다.</p></section>
+<nav class="chapter-nav" aria-label="장 이동"><a href="../index.html">← 목차</a><a href="ch02-big-o.html">다음: Big-O →</a></nav></main><footer class="site-footer"><small>MIT 6.006 Feynman 교재</small></footer></body></html>
